@@ -24,7 +24,7 @@ enum UserRole{
 
 
 model User{
-  id String @default(uuid())
+  id String @id @default(uuid())
   name String?
   email String @unique
   image String?
