@@ -1,3 +1,5 @@
+
+import axios from "axios";
 export const getJudge0LanguageId = (Language) =>{
     const languageMap = {
         "PYTHON" : 71,
@@ -10,8 +12,62 @@ export const getJudge0LanguageId = (Language) =>{
 
 
 
+const judge0Api = async (endPoint,method,data) =>{
+    const options = {
+        method: method,
+        url: `${process.env.JUDGE0_API_URL}${endPoint}`,
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${process.env.JUDGE0_API_KEY} `
+        },
+        data: data
+        };
+
+        return await axios.request(options);
+}
+
+
+
+
+
+const sleep = (ms) => new Promise((resolve)=> setTimeout(resolve,ms));
+
+
+
+export const poolBatchResult = async (tokens) =>{
+    while(true)
+    {
+        console.log("Tokens11111:",tokens);
+            
+        const {data} = await axios.get(`${process.env.JUDGE0_API_URL}/submissions/batch`,{
+            params:{
+                tokens:tokens.join(","),
+                base64_encoded:false,
+            }
+        })
+
+
+        console.log("Data:",data);
+
+        const results = data.submissions;
+        console.log("Results:",results);
+
+        const isAllDone = results.every(
+            (res)=> res.status.id !==1 && res.status.id !==2
+        )
+        console.log("Is All Done:",isAllDone);
+
+        if(isAllDone) return results
+
+        await sleep(1000)
+
+    }
+}
+
+
 export const submitBatch = async (submissions) =>{
-    const {data} = await axios.post(`${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,{
+    const {data} = await judge0Api("/submissions/batch", "POST", {
         submissions
     })
 
@@ -22,27 +78,14 @@ export const submitBatch = async (submissions) =>{
 }
 
 
-const sleep = (ms) => new Promise((resolve)=> setTimeout(resolve,ms))
 
-export const poolBatchResult = async (tokens) =>{
-    while(true)
-    {
-        const {data} = await axios.get(`${process.env.JUDGE0_API_URL}/submissions/batch`,{
-            params:{
-                token:tokens.join(","),
-                base64_encoded:false,
-            }
-        })
 
-        const results = data.submissions;
-
-        const isAllDone = results.every(
-            (res)=> res.status.id !==1 && res.status.id !==2
-        )
-
-        if(isAllDone) return results
-
-        await sleep(1000)
-
+export function getLanguageName(LanguageId){
+    const LANGUAGE_NAMES = {
+        74:"TypeScript",
+        63:"JavaScript",
+        62:"Java",
+        71:"Python",
     }
+    return LANGUAGE_NAMES[LanguageId] || "Unknown"
 }
