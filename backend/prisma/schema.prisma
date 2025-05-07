@@ -14,126 +14,116 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
-
-enum UserRole{
+enum UserRole {
   ADMIN
   USER
 }
 
-enum Difficulty{
+enum Difficulty {
   EASY
   MEDIUM
   HARD
 }
 
-enum  Status{
+enum Status {
   Accepted
   WrongAnswer
 }
 
-model User{
-  id String @id @default(uuid())
-  name String?
-  email String @unique
-  image String?
-  role UserRole @default(USER)
-  password String
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  image     String?
+  role      UserRole @default(USER)
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  problems Problem[]
-  submission Submission[]
+  problems      Problem[]
+  submission    Submission[]
   problemSolved ProblemSolved[]
 }
 
-
-model Problem{
-  id String @id @default(uuid())
-  title String
+model Problem {
+  id          String     @id @default(uuid())
+  title       String
   description String
-  difficulty Difficulty
-  tags String[] //["tag1","tag2","tag3"]
-  userId String
-  examples Json
+  difficulty  Difficulty
+  tags        String[] //["tag1","tag2","tag3"]
+  userId      String
+  examples    Json
   constraints String
-  hints String?
-  editorial String?
+  hints       String?
+  editorial   String?
 
-
-  testcases Json //{[{"input":"1","output":"1"},{"input":"2","output":"2"}]}
-  codeSnippets Json //[python,java,c++,javaScript]
+  testcases          Json //{[{"input":"1","output":"1"},{"input":"2","output":"2"}]}
+  codeSnippets       Json //[python,java,c++,javaScript]
   referenceSolutions Json
-
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-
   //Relationships
-  user User @relation(fields:[userId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   submission Submission[]
-  solvedBy ProblemSolved[]
+  solvedBy   ProblemSolved[]
 }
 
-model Submission{
-  id String @id @default(uuid())
-  userId String
-  problemId String
-  sourcecode String
-  language String
-  stdin String?
-  stdout String?
-  stderr String?
+model Submission {
+  id            String  @id @default(uuid())
+  userId        String
+  problemId     String
+  sourcecode    String
+  language      String
+  stdin         String?
+  stdout        String?
+  stderr        String?
   compileOutput String?
-  status Status
-  memory String?
-  time String?
+  status        Status
+  memory        String?
+  time          String?
 
-createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   //Relationships
-  user User @relation(fields:[userId],references: [id],onDelete: Cascade)
-  problem Problem @relation(fields:[problemId],references: [id],onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   testCases TestCaseResult[]
-
 }
 
-model TestCaseResult{
-  id String @id @default(uuid())
-  submissionId String
-  testCase Int
-  passed Boolean
-  stdout String?
-  expected String?
-  stderr String?
+model TestCaseResult {
+  id            String  @id @default(uuid())
+  submissionId  String
+  testCase      Int
+  passed        Boolean
+  stdout        String?
+  expected      String?
+  stderr        String?
   compileOutput String?
-  status Status
-  memory String?
-  time String?
+  status        Status
+  memory        String?
+  time          String?
 
-
-  submission Submission @relation(fields:[submissionId],references: [id],onDelete: Cascade)
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@index([submissionId])
 }
 
-
-model ProblemSolved{
-  id String @id @default(uuid())
-  userId String
+model ProblemSolved {
+  id        String @id @default(uuid())
+  userId    String
   problemId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   //Relationships
-  user  User @relation(fields: [userId],references: [id],onDelete: Cascade)
-  problem Problem @relation(fields: [problemId],references: [id],onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
-  @@unique([userId,problemId])
+  @@unique([userId, problemId])
 }
