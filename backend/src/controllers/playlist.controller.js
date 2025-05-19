@@ -1,5 +1,5 @@
 import e from "express";
-import { db } from "../libs/db";
+import { db } from "../libs/db.js";
 
 export const createPlaylist = async (req,res) =>{
     try {

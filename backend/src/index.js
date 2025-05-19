@@ -1,13 +1,14 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import axios from "axios";
+import cors from "cors"
 
 import authRoutes from "./routes/auth.routes.js";
 import problemRoutes from "./routes/problem.routes.js";
 import executeRoutes from "./routes/executeCode.routes.js";
 import executionRoutes from "./routes/executeCode.routes.js";
 import playlistRoutes from "./routes/playlist.routes.js";
+import submissionRoutes from "./routes/submission.routes.js";
 
 dotenv.config();
 
@@ -15,6 +16,13 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(express.urlencoded({ extended: true })); 
+app.use(
+  cors({
+    origin:"http://localhost:5173",
+    credentials:true
+  })
+)
 
 app.get("/", (req, res) => {
   res.send("Hello welcome to leetlab 🔥");

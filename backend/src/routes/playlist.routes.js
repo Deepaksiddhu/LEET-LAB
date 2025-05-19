@@ -1,10 +1,10 @@
 import express from 'express';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { addProblemToPlaylist, createPlaylist, deletePlaylist, getAllListDetails, getPlayListDetails, removeProblemFromPlaylist } from '../controllers/playlist.controller';
+import { authMiddleware } from '../middleware/auth.middleware.js';
+import { addProblemToPlaylist, createPlaylist, deletePlaylist, getAllListDetails, getPlayListDetails, removeProblemFromPlaylist } from '../controllers/playlist.controller.js';
 
 const playlistRoutes = express.Router();
 
-playlistRoutes.get.apply("/",authMiddleware,getAllListDetails);
+playlistRoutes.get("/",authMiddleware,getAllListDetails);
 
 playlistRoutes.get("/:playlistId",authMiddleware,getPlayListDetails);
 

@@ -1,6 +1,6 @@
 import express from 'express';
-import { authMiddleware } from '../middleware/auth.middleware';
-import { getAllSubmission, getAllSubmissionForProblem, getSubmissionsForProblem } from '../controllers/submission.controller';
+import { authMiddleware } from '../middleware/auth.middleware.js';
+import { getAllSubmission, getAllSubmissionForProblem, getSubmissionsForProblem } from '../controllers/submission.controller.js';
 
 
 

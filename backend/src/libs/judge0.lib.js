@@ -38,7 +38,7 @@ const sleep = (ms) => new Promise((resolve)=> setTimeout(resolve,ms));
 export const poolBatchResult = async (tokens) =>{
     while(true)
     {
-        console.log("Tokens11111:",tokens);
+        // console.log("Tokens11111:",tokens);
             
         const {data} = await axios.get(`${process.env.JUDGE0_API_URL}/submissions/batch`,{
             params:{
@@ -48,7 +48,7 @@ export const poolBatchResult = async (tokens) =>{
         })
 
 
-        console.log("Data:",data);
+        // console.log("Data:",data);
 
         const results = data.submissions;
         console.log("Results:",results);
@@ -71,7 +71,7 @@ export const submitBatch = async (submissions) =>{
         submissions
     })
 
-    console.log("Submission Results:",data);
+    // console.log("Submission Results:",data);
 
     return data // [{token},{token},{token}]
     

@@ -1,5 +1,4 @@
-import { use } from "react";
-import { db } from "../libs/db";
+import { db } from "../libs/db.js";
 
 export const getAllSubmission = async (req, res) => {
     try {
