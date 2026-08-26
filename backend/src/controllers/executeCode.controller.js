@@ -28,7 +28,14 @@ const getSubmissionStatus = (detailedResults) => {
 
 export const executeCode = async (req, res) => {
   try {
-    const { source_code, language_id, stdin, expected_outputs, problemId } =
+    const {
+      source_code,
+      language_id,
+      stdin,
+      expected_outputs,
+      problemId,
+      submit = true,
+    } =
       req.body;
 
     const userId = req.user.id;
@@ -122,6 +129,31 @@ export const executeCode = async (req, res) => {
     // Determine overall submission status
     const { status: submissionStatus, allPassed } =
       getSubmissionStatus(detailedResults);
+
+    // Running code should preview results without creating a submission or
+    // marking the problem as solved. Only an explicit submit persists data.
+    if (!submit) {
+      const passedCount = detailedResults.filter((result) => result.passed).length;
+      return res.status(200).json({
+        success: true,
+        message: `${passedCount}/${detailedResults.length} test cases passed`,
+        submission: {
+          status: submissionStatus,
+          testCases: detailedResults.map((result) => ({
+            id: `${problemId}-${result.testCase}`,
+            testCase: result.testCase,
+            passed: result.passed,
+            stdout: result.stdout,
+            expected: result.expected,
+            stderr: result.stderr,
+            compileOutput: result.compile_output,
+            status: result.status,
+            memory: result.memory,
+            time: result.time,
+          })),
+        },
+      });
+    }
 
     // --- 6–8. Persist everything in a transaction for atomicity ---
     const submissionWithTestCases = await db.$transaction(async (tx) => {

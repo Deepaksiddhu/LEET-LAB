@@ -10,7 +10,7 @@ export const useExecutionStore = create((set) => ({
     submission:null,
 
 
-    executeCode:async (source_code, language_id, stdin, expected_outputs, problemId)=>{
+    executeCode:async (source_code, language_id, stdin, expected_outputs, problemId, submit = true)=>{
         try {
             set({isExecuting:true})
 
@@ -19,11 +19,15 @@ export const useExecutionStore = create((set) => ({
                 language_id,
                 stdin,
                 expected_outputs,
-                problemId
+                problemId,
+                submit,
             })
 
-            set({submission:res.data.submission})
+            if (submit) {
+                set({submission:res.data.submission})
+            }
             toast.success(res.data.message)
+            return res.data.submission;
 
         } catch (error) {
             console.log("Error executing code", error)

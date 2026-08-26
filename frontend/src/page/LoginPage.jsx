@@ -15,6 +15,7 @@ import {z} from "zod";
 import AuthImagePattern from '../components/AuthImagePattern';
 import { useAuthStore } from '../store/useAuthStore';
 import Goog_leLogin from '../components/GoogleLoginButton';
+import GoogleLoginButton from "../components/GoogleLoginButton";
 // import { GoogleLogin } from '@react-oauth/google';
 // import axios from 'axios';
 

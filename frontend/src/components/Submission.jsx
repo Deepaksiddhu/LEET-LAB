@@ -2,18 +2,26 @@ import React from 'react';
 import { CheckCircle2, XCircle, Clock, MemoryStick as Memory } from 'lucide-react';
 
 const SubmissionResults = ({ submission }) => {
-  // Parse stringified arrays
-  const memoryArr = JSON.parse(submission.memory || '[]');
-  const timeArr = JSON.parse(submission.time || '[]');
+  const parseArray = (value) => {
+    if (Array.isArray(value)) return value;
+    try {
+      return JSON.parse(value || "[]");
+    } catch {
+      return [];
+    }
+  };
+
+  const memoryArr = parseArray(submission.memory);
+  const timeArr = parseArray(submission.time);
 
   // Calculate averages
-  const avgMemory = memoryArr
-    .map(m => parseFloat(m)) // remove ' KB' using parseFloat
-    .reduce((a, b) => a + b, 0) / memoryArr.length;
+  const avgMemory = memoryArr.length
+    ? memoryArr.map(m => parseFloat(m)).reduce((a, b) => a + b, 0) / memoryArr.length
+    : 0;
 
-  const avgTime = timeArr
-    .map(t => parseFloat(t)) // remove ' s' using parseFloat
-    .reduce((a, b) => a + b, 0) / timeArr.length;
+  const avgTime = timeArr.length
+    ? timeArr.map(t => parseFloat(t)).reduce((a, b) => a + b, 0) / timeArr.length
+    : 0;
 
   const passedTests = submission.testCases.filter(tc => tc.passed).length;
   const totalTests = submission.testCases.length;

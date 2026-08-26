@@ -15,6 +15,12 @@ import {
   Users,
   ThumbsUp,
   Home,
+  CheckCircle,
+  RotateCcw,
+  Maximize2,
+  Minimize2,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { useProblemStore } from "../store/useProblemStore";
@@ -41,6 +47,9 @@ const ProblemPage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [testcases, setTestCases] = useState([]);
+  const [runResult, setRunResult] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [editorTheme, setEditorTheme] = useState("vs-dark");
 
   const { executeCode, submission, isExecuting } = useExecutionStore();
 
@@ -66,7 +75,8 @@ const ProblemPage = () => {
     if (problem) {
       // Set initial code from code snippets for the selected language
       const initialCode = problem.codeSnippets?.[selectedLanguage] || "";
-      setCode(initialCode);
+      const savedCode = localStorage.getItem(`leetlab-code-${id}-${selectedLanguage}`);
+      setCode(savedCode ?? initialCode);
       setTestCases(
         problem.testcases?.map((tc) => ({
           input: tc.input,
@@ -75,6 +85,12 @@ const ProblemPage = () => {
       );
     }
   }, [problem, selectedLanguage]);
+
+  useEffect(() => {
+    if (id && selectedLanguage) {
+      localStorage.setItem(`leetlab-code-${id}-${selectedLanguage}`, code);
+    }
+  }, [code, id, selectedLanguage]);
 
   useEffect(() => {
     if (activeTab === "submissions" && id) {
@@ -93,16 +109,32 @@ const ProblemPage = () => {
     }
   };
 
-  const handleRunCode = (e) => {
+  const handleExecute = async (e, submit) => {
     e.preventDefault();
     try {
       const language_id = getLanguageId(selectedLanguage);
       const stdin = problem.testcases.map((tc) => tc.input);
       const expected_outputs = problem.testcases.map((tc) => tc.output);
-      executeCode(code, language_id, stdin, expected_outputs, id);
+      const result = await executeCode(
+        code,
+        language_id,
+        stdin,
+        expected_outputs,
+        id,
+        submit
+      );
+      if (!submit) setRunResult(result);
+      else setRunResult(null);
     } catch (error) {
       console.log("Error executing code", error);
     }
+  };
+
+  const handleResetCode = () => {
+    const initialCode = problem.codeSnippets?.[selectedLanguage] || "";
+    localStorage.removeItem(`leetlab-code-${id}-${selectedLanguage}`);
+    setCode(initialCode);
+    setRunResult(null);
   };
 
   if (isProblemLoading || !problem) {
@@ -211,7 +243,7 @@ const ProblemPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-base-300 to-base-200 max-w-7xl w-full">
+    <div className={`min-h-screen bg-gradient-to-br from-base-300 to-base-200 max-w-7xl w-full ${isFullscreen ? "fixed inset-0 z-[60] max-w-none" : ""}`}>
       <nav className="navbar bg-base-100 shadow-lg px-4">
         <div className="flex-1 gap-2">
           <Link to={"/"} className="flex items-center gap-2 text-primary">
@@ -312,20 +344,31 @@ const ProblemPage = () => {
             </div>
           </div>
 
-          <div className="card bg-base-100 shadow-xl">
+          <div className={`card bg-base-100 shadow-xl ${isFullscreen ? "h-full rounded-none" : ""}`}>
             <div className="card-body p-0">
-              <div className="tabs tabs-bordered">
+              <div className="flex items-center justify-between border-b border-base-300 px-4">
                 <button className="tab tab-active gap-2">
                   <Terminal className="w-4 h-4" />
                   Code Editor
                 </button>
+                <div className="flex items-center gap-1">
+                  <button type="button" className="btn btn-ghost btn-sm btn-square" title="Reset code" onClick={handleResetCode}>
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
+                  <button type="button" className="btn btn-ghost btn-sm btn-square" title="Toggle editor theme" onClick={() => setEditorTheme((theme) => theme === "vs-dark" ? "light" : "vs-dark")}>
+                    {editorTheme === "vs-dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  </button>
+                  <button type="button" className="btn btn-ghost btn-sm btn-square" title={isFullscreen ? "Exit fullscreen" : "Fullscreen editor"} onClick={() => setIsFullscreen((fullscreen) => !fullscreen)}>
+                    {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
-              <div className="h-[500px] w-full">
+              <div className={`${isFullscreen ? "flex-1 min-h-0" : "h-[500px]"} w-full`}>
                 <Editor
                   height="100%"
                   language={selectedLanguage.toLowerCase()}
-                  theme="vs-dark"
+                  theme={editorTheme}
                   value={code}
                   onChange={(value) => setCode(value || "")}
                   options={{
@@ -346,14 +389,15 @@ const ProblemPage = () => {
                     className={`btn btn-primary gap-2 ${
                       isExecuting ? "loading" : ""
                     }`}
-                    onClick={handleRunCode}
+                    onClick={(event) => handleExecute(event, false)}
                     disabled={isExecuting}
                   >
                     {!isExecuting && <Play className="w-4 h-4" />}
                     Run Code
                   </button>
-                  <button className="btn btn-success gap-2">
-                    Submit Solution
+                  <button className="btn btn-success gap-2" onClick={(event) => handleExecute(event, true)} disabled={isExecuting}>
+                    <CheckCircle className="w-4 h-4" />
+                    Submit Code
                   </button>
                 </div>
               </div>
@@ -363,8 +407,8 @@ const ProblemPage = () => {
 
         <div className="card bg-base-100 shadow-xl mt-6">
           <div className="card-body">
-            {submission ? (
-              <Submission submission={submission} />
+            {runResult || submission ? (
+              <Submission submission={runResult || submission} />
             ) : (
               <>
                 <div className="flex items-center justify-between mb-6">
