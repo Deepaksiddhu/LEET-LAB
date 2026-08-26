@@ -35,10 +35,10 @@ const ProblemPage = () => {
   const { getProblemById, problem, isProblemLoading } = useProblemStore();
 
   const {
-    submission: submissions,
+    problemSubmissions,
     isLoading: isSubmissionsLoading,
     getSubmissionForProblem,
-    // getSubmissionCountForProblem,
+    getSubmissionCountForProblem,
     submissionCount,
   } = useSubmissionStore();
 
@@ -55,8 +55,8 @@ const ProblemPage = () => {
 
   useEffect(() => {
     getProblemById(id);
-    // getSubmissionCountForProblem(id);
-  }, [id, getProblemById]);
+    getSubmissionCountForProblem(id);
+  }, [id, getProblemById, getSubmissionCountForProblem]);
 
   // Set initial language and code when problem loads
   useEffect(() => {
@@ -98,8 +98,6 @@ const ProblemPage = () => {
     }
   }, [activeTab, id, getSubmissionForProblem]);
 
-  console.log("submission", submissions);
-
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
     setSelectedLanguage(lang);
@@ -126,7 +124,7 @@ const ProblemPage = () => {
       if (!submit) setRunResult(result);
       else setRunResult(null);
     } catch (error) {
-      console.log("Error executing code", error);
+      return;
     }
   };
 
@@ -211,7 +209,7 @@ const ProblemPage = () => {
       case "submissions":
         return (
           <SubmissionsList
-            submissions={submissions}
+            submissions={problemSubmissions}
             isLoading={isSubmissionsLoading}
           />
         );
@@ -264,7 +262,7 @@ const ProblemPage = () => {
               </span>
               <span className="text-base-content/30">•</span>
               <Users className="w-4 h-4" />
-              <span>{submissionCount} Submissions</span>
+              <span>{submissionCount ?? 0} Submissions</span>
               <span className="text-base-content/30">•</span>
               <ThumbsUp className="w-4 h-4" />
               <span>95% Success Rate</span>

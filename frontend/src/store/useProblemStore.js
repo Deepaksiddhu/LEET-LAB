@@ -14,18 +14,21 @@ export const useProblemStore = create((set)=>({
 
     getAllProblems:async()=>{
         try {
-            set({isProblemLoading:true})
+            set({isProblemsLoading:true})
 
             const res = await axiosInstance.get("/problems/get-all-problems");
 
             set({problems:res.data.problems})
 
         } catch (error) {
-            console.log("Error in getting all problems",error);
-            toast.error("Error in getting all problems")
+            const errorMessage =
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                "Error in getting all problems";
+            toast.error(errorMessage)
         }
         finally{
-            set({isProblemLoading:false})
+            set({isProblemsLoading:false})
         }
     },
 
@@ -40,8 +43,11 @@ export const useProblemStore = create((set)=>({
 
 
         } catch (error) {
-            console.log("Error fetching problem",error);
-            toast.error("Error fetching problem")
+            const errorMessage =
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                "Error fetching problem";
+            toast.error(errorMessage)
         }
         finally{
             set({isProblemLoading:false})
@@ -50,12 +56,15 @@ export const useProblemStore = create((set)=>({
 
     getSolvedProblemByUser:async() =>{
         try {
-            const res = await axiosInstance.get("/problems/get-solved-problem")
+            const res = await axiosInstance.get("/problems/get-solved-problems")
             set({solvedProblems:res.data.problems})
             
         } catch (error) {
-            console.log("Error in getting solved problems",error);
-            toast.error("Error in getting solved problems")
+            const errorMessage =
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                "Error in getting solved problems";
+            toast.error(errorMessage)
         }
     },
 
@@ -67,8 +76,11 @@ export const useProblemStore = create((set)=>({
                 problems: state.problems.filter((problem) => problem.id !== id)
             }));
         } catch (error) {
-            console.log("Error deleting problem", error);
-            toast.error("Error deleting problem");
+            const errorMessage =
+                error.response?.data?.error ||
+                error.response?.data?.message ||
+                "Error deleting problem";
+            toast.error(errorMessage);
         }
     }
 

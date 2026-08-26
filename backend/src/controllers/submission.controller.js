@@ -3,7 +3,7 @@ import { db } from "../libs/db.js";
 export const getAllSubmission = async (req, res) => {
     try {
         const userId = req.user.id;
-        const submission = await db.submission.findMany({
+        const submissions = await db.submission.findMany({
             where:{
                 userId:userId
             }
@@ -12,7 +12,7 @@ export const getAllSubmission = async (req, res) => {
         res.status(200).json({
             success:true,
             message:"Submission fetched successfully",
-            submission
+            submissions
         })
     } catch (error) {
         console.error("Error fetching submissions:", error);
@@ -29,7 +29,7 @@ export const getSubmissionsForProblem = async (req, res) => {
     try {
         const userId = req.user.id;
         const problemId = req.params.problemId;
-        const submission = await db.submission.findMany({
+        const submissions = await db.submission.findMany({
             where:{
                 userId:userId,
                 problemId:problemId
@@ -39,7 +39,7 @@ export const getSubmissionsForProblem = async (req, res) => {
         res.status(200).json({
             success:true,
             message:"Submission fetched successfully",
-            submission
+            submissions
         })
     } catch (error) {
         console.error("Error fetching submissions:", error);
@@ -59,7 +59,7 @@ export const getAllSubmissionForProblem = async (req, res) => {
     try {
         const problemId = req.params.problemId;
 
-        const submission = await db.submission.count({
+        const submissionCount = await db.submission.count({
             where:{
                 problemId:problemId
             }
@@ -69,7 +69,7 @@ export const getAllSubmissionForProblem = async (req, res) => {
         res.status(200).json({
             success:true,
             message:"Submission fetched successfully",
-            count:submission
+            submissionCount
 
         })
     } catch (error) {

@@ -10,8 +10,6 @@ const Navbar = ()=>{
 
     const {authUser} = useAuthStore()
 
-    console.log("AUTH_USER",authUser)
-
     return (
      <nav className="sticky top-0 z-50 w-full py-2">
       <div className="flex w-full justify-between mx-auto max-w-4xl bg-black/15 shadow-lg shadow-neutral-600/5 backdrop-blur-lg border border-gray-200/10 p-2 rounded-2xl">
@@ -37,7 +35,6 @@ const Navbar = ()=>{
                   className="object-cover"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
-                    console.log("Image failed to load, using fallback");
                     e.target.src = "https://avatar.iran.liara.run/public/boy";
                   }}
                 />

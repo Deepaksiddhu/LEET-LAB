@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 export const useSubmissionStore = create((set) => ({
   isLoading: false,
   submissions: [],
-  submission: null,
+  problemSubmissions: [],
   submissionCount: null,
 
   getAllSubmissions: async () => {
@@ -17,8 +17,11 @@ export const useSubmissionStore = create((set) => ({
 
       toast.success(res.data.message);
     } catch (error) {
-      console.log("Error getting all submissions", error);
-      toast.error("Error getting all submissions");
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Error getting all submissions";
+      toast.error(errorMessage);
     } finally {
       set({ isLoading: false });
     }
@@ -26,18 +29,19 @@ export const useSubmissionStore = create((set) => ({
 
   getSubmissionForProblem: async (problemId) => {
     try {
+      set({ isLoading: true });
       const res = await axiosInstance.get(
         `/submission/get-submission/${problemId}`
       );
 
-      set({ submission: res.data.submissions });
-
-      
+      set({ problemSubmissions: res.data.submissions || [] });
 
     } catch (error) {
-      console.log("Error getting submissions for problem", error);
-
-      toast.error("Error getting submissions for problem");
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Error getting submissions for problem";
+      toast.error(errorMessage);
       
     } finally {
       set({ isLoading: false });
@@ -46,12 +50,15 @@ export const useSubmissionStore = create((set) => ({
 
   getSubmissionCountForProblem: async (problemId) => {
     try {
-      const res = await axiosInstance.get(`/submission/get-submissions-count/${problemId}`);
+      const res = await axiosInstance.get(`/submission/get-submission-count/${problemId}`);
 
-      set({ submissionCount: res.data.count });
+      set({ submissionCount: res.data.submissionCount || 0 });
     } catch (error) {
-      console.log("Error getting submission count for problem", error);
-      toast.error("Error getting submission count for problem");
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Error getting submission count for problem";
+      toast.error(errorMessage);
     }
   },
 }));
