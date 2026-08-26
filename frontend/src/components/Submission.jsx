@@ -87,6 +87,7 @@ const SubmissionResults = ({ submission }) => {
                   <th>Status</th>
                   <th>Expected Output</th>
                   <th>Your Output</th>
+                  <th>Error Output</th>
                   <th>Memory</th>
                   <th>Time</th>
                 </tr>
@@ -109,6 +110,15 @@ const SubmissionResults = ({ submission }) => {
                     </td>
                     <td className="font-mono">{testCase.expected}</td>
                     <td className="font-mono">{testCase.stdout || 'null'}</td>
+                    <td className="font-mono text-xs max-w-sm whitespace-pre-wrap break-words">
+                      {testCase.compileOutput ? (
+                        <span className="text-error">Compilation Error: {testCase.compileOutput}</span>
+                      ) : testCase.stderr ? (
+                        <span className="text-warning">Runtime Error: {testCase.stderr}</span>
+                      ) : (
+                        <span className="text-success">None</span>
+                      )}
+                    </td>
                     <td>{testCase.memory}</td>
                     <td>{testCase.time}</td>
                   </tr>
